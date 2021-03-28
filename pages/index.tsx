@@ -28,15 +28,17 @@ export default function Home() {
 
   useEffect(() => {
     const getData = async () => {
+      let i = 0;
       search.coins.slice(0, 99).forEach(async (coin, index) => {
         const { data } = await axios.get<ICoin>(
           `https://api.coingecko.com/api/v3/coins/${coin.id}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`
         );
         setCoins(coins.set(coin.id, data));
-        setAthToday(getAth(search, coins, 'YYYY-MM-DD'));
-        setAthWeek(getAth(search, coins, 'YYYY-w'));
-        setAthMoon(getAth(search, coins, 'YYYY-MM>'));
-        setProgress(index + 1);
+        setAthToday(getAth(search, coins, 1));
+        setAthWeek(getAth(search, coins, 7));
+        setAthMoon(getAth(search, coins, 30));
+        setProgress(i + 1);
+        i++;
       });
     };
     getData();
@@ -97,13 +99,17 @@ export default function Home() {
   );
 }
 
-function getAth(search: ISearch, coins: Map<string, ICoin>, format: string) {
+function getAth(search: ISearch, coins: Map<string, ICoin>, day: number) {
   const ath: ICoin[] = [];
-  const week = dayjs().format(format);
+  const now = new Date().toISOString();
   for (const index in search.coins.slice(0, 99)) {
     const coin = search.coins[index];
     const coinMap = coins.get(coin.id);
-    if (coinMap && coinMap.market_data.ath_date.usd && dayjs(coinMap.market_data.ath_date.usd).format(format) === week) {
+    if (
+      coinMap &&
+      coinMap.market_data.ath_date.usd &&
+      dayjs(coinMap.market_data.ath_date.usd).add(day, 'day').toDate().toISOString() >= now
+    ) {
       ath.push(coinMap);
     }
   }
