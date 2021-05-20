@@ -10,6 +10,8 @@ import advancedFormat from 'dayjs/plugin/advancedFormat';
 dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
 
+const limit = 500;
+
 export default function Home() {
   const [search, setSearch] = useState<ISearch>({ coins: [], exchanges: [], icos: [] });
   const [coins, setCoins] = useState(new Map<string, ICoin>());
@@ -29,16 +31,20 @@ export default function Home() {
   useEffect(() => {
     const getData = async () => {
       let i = 0;
-      search.coins.slice(0, 99).forEach(async (coin, index) => {
-        const { data } = await axios.get<ICoin>(
-          `https://api.coingecko.com/api/v3/coins/${coin.id}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`
-        );
-        setCoins(coins.set(coin.id, data));
-        setAthToday(getAth(search, coins, 1));
-        setAthWeek(getAth(search, coins, 7));
-        setAthMoon(getAth(search, coins, 30));
-        setProgress(i + 1);
-        i++;
+      search.coins.slice(0, limit).forEach(async (coin, index) => {
+        try {
+          await later(index * 1050);
+          const { data } = await axios.get<ICoin>(
+            `https://api.coingecko.com/api/v3/coins/${coin.id}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`
+          );
+          setCoins(coins.set(coin.id, data));
+          setAthToday(getAth(search, coins, 1));
+          setAthWeek(getAth(search, coins, 7));
+          setAthMoon(getAth(search, coins, 30));
+          setProgress(++i);
+        } catch (e) {
+          console.log(e);
+        }
       });
     };
     getData();
@@ -49,8 +55,7 @@ export default function Home() {
       <Head>
         <title>ATH</title>
       </Head>
-      <Progress value={progress} />({progress} / 99)
-      <Heading>本日新高</Heading>
+      <Progress value={(progress / limit) * 100} />({progress} / {limit})<Heading>本日新高</Heading>
       <OrderedList>
         {athToday.map(coin => (
           <ListItem key={coin.id}>
@@ -115,3 +120,9 @@ function getAth(search: ISearch, coins: Map<string, ICoin>, day: number) {
   }
   return ath;
 }
+
+const later = (delay: number) => {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, delay);
+  });
+};
