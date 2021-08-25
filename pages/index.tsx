@@ -55,7 +55,7 @@ export default function Home() {
       <Head>
         <title>ATH</title>
       </Head>
-      <Progress value={(progress / limit) * 100} />({progress} / {limit})<Heading>本日新高</Heading>
+      <Progress value={(progress / limit) * 100} />({progress} / {limit})<Heading>24小时新高</Heading>
       <OrderedList>
         {athToday.map(coin => (
           <ListItem key={coin.id}>
@@ -70,7 +70,7 @@ export default function Home() {
           </ListItem>
         ))}
       </OrderedList>
-      <Heading>本周新高</Heading>
+      <Heading>7天新高</Heading>
       <OrderedList>
         {athWeek.map(coin => (
           <ListItem key={coin.id}>
@@ -85,7 +85,7 @@ export default function Home() {
           </ListItem>
         ))}
       </OrderedList>
-      <Heading>本月新高</Heading>
+      <Heading>30天新高</Heading>
       <OrderedList>
         {athMoon.map(coin => (
           <ListItem key={coin.id}>
