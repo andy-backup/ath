@@ -33,7 +33,7 @@ export default function Home() {
       let i = 0;
       search.coins.slice(0, limit).forEach(async (coin, index) => {
         try {
-          await later(index * 1050);
+          await later(index * 1150);
           const { data } = await axios.get<ICoin>(
             `https://api.coingecko.com/api/v3/coins/${coin.id}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`
           );
